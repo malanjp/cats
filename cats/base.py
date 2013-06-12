@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from gevent.wsgi import WSGIServer
+from gevent import monkey
 
 class CatsHttpBase(object):
     def __init__(self):
@@ -17,7 +18,9 @@ class CatsHttpBase(object):
         return ret
 
     def make_server(self, address='localhost', port=8000, app=None):
-        server = WSGIServer((address, port), app)
+        monkey.patch_all()
+
+        server = WSGIServer((address, port), app, log=None)
         try:
             print "Server running on port %s:%d. Ctrl+C to quit" % (address, port)
             server.serve_forever()

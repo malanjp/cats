@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from gevent.wsgi import WSGIServer
-from gevent import monkey
+from gevent.pywsgi import WSGIServer
+from gevent import monkey; monkey.patch_all()
+from socketio.server import SocketIOServer
 
-class CatsHttpBase(object):
+class CatsWebBase(object):
     def __init__(self):
         pass
 
@@ -12,16 +13,18 @@ class CatsHttpBase(object):
 
         start_response(status, headers)
 
-        #ret = [("%s: %s\n" % (key, value)).encode("utf-8")
-        #       for key, value in environ.items()]
-        ret = []
+        ret = [("%s: %s\n" % (key, value)).encode("utf-8")
+               for key, value in environ.items()]
+        #ret = []
         return ret
 
     def make_server(self, address='localhost', port=8000, app=None):
-        monkey.patch_all()
 
-        server = WSGIServer((address, port), app, log=None)
+        #server = WSGIServer((address, port), app, log=None)
         try:
+            server = SocketIOServer((address, port), app,
+                    resource="socket.io", policy_server=True,
+                    policy_listener=('0.0.0.0', 10843))
             print "Server running on port %s:%d. Ctrl+C to quit" % (address, port)
             server.serve_forever()
         except KeyboardInterrupt:
@@ -29,6 +32,8 @@ class CatsHttpBase(object):
             print "Bye bye"
 
 
+class CatsSocketIoBase(object):
+    pass
 
 
 

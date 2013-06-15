@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from gevent.pywsgi import WSGIServer
 from gevent import monkey; monkey.patch_all()
 from socketio.server import SocketIOServer
 

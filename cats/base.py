@@ -17,6 +17,7 @@ class BroadcastWebSocket(EchoWebSocket):
     def opened(self):
         app = self.environ['ws4py.app']
         app.clients.append(self)
+        print('ws opend')
 
     def received_message(self, m):
         # self.clients is set from within the server
@@ -28,6 +29,7 @@ class BroadcastWebSocket(EchoWebSocket):
             client.send(m)
 
     def closed(self, code, reason="A client left the room without a proper explanation."):
+        print('ws closed')
         app = self.environ.pop('ws4py.app')
         if self in app.clients:
             app.clients.remove(self)
@@ -37,8 +39,7 @@ class BroadcastWebSocket(EchoWebSocket):
                 except:
                     pass
 
-
-class EchoWebSocketApplication(object):
+class WebSocketHandler(object):
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -54,10 +55,12 @@ class EchoWebSocketApplication(object):
         Good ol' WSGI application. This is a simple demo
         so I tried to stay away from dependencies.
         """
+        print(environ['PATH_INFO'])
         if environ['PATH_INFO'] == '/favicon.ico':
             return self.favicon(environ, start_response)
 
         if environ['PATH_INFO'] == '/ws':
+            print('ws')
             environ['ws4py.app'] = self
             return self.ws(environ, start_response)
 
@@ -80,105 +83,10 @@ class EchoWebSocketApplication(object):
         headers = [('Content-type', 'text/html')]
 
         start_response(status, headers)
-
-        return """<html>
-        <head>
-        <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
-          <script type='application/javascript'>
-            $(document).ready(function() {
-
-              websocket = 'ws://%(host)s:%(port)s/ws';
-              if (window.WebSocket) {
-                console.log('websocket');
-                ws = new WebSocket(websocket);
-                console.log(ws);
-              }
-              else if (window.MozWebSocket) {
-                console.log('mozwebsocket');
-                ws = MozWebSocket(websocket);
-              }
-              else {
-                console.log('WebSocket Not Supported');
-                return;
-              }
-
-              window.onbeforeunload = function(e) {
-                 $('#chat').val($('#chat').val() + 'Bye bye...\\n');
-                 ws.close(1000, '%(username)s left the room');
-
-                 if(!e) e = window.event;
-                 e.stopPropagation();
-                 e.preventDefault();
-              };
-              ws.onmessage = function (evt) {
-                 $('#chat').val($('#chat').val() + evt.data + '\\n');
-              };
-              ws.onopen = function() {
-                 ws.send("%(username)s entered the room");
-              };
-              ws.onclose = function(evt) {
-                console.log('closed');
-                 $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\\n');
-              };
-
-              $('#send').click(function() {
-                 console.log($('#message').val());
-                 ws.send('%(username)s: ' + $('#message').val());
-                 $('#message').val("");
-                 return false;
-              });
-            });
-          </script>
-        </head>
-        <body>
-        <form action='#' id='chatform' method='get'>
-          <textarea id='chat' cols='35' rows='10'></textarea>
-          <br />
-          <label for='message'>%(username)s: </label><input type='text' id='message' />
-          <input id='send' type='submit' value='Send' />
-          </form>
-        </body>
-        </html>
-        """ % {'username': "User%d" % random.randint(0, 100),
-               'host': self.host,
-               'port': self.port}
+        print(args.host, args.port)
+        return "this is a WebSocketHandler class."
 
 
-class BaseHandler(object):
-    def __init__(self, request):
-        self.request = request
-
-    def before_request(self):
-        pass
-
-    def after_request(self, response):
-        return response
-
-    @classmethod
-    def dispath(cls, request):
-        pass
-
-
-class Dispatcher(object):
-    def __init__(self):
-        pass
-
-    def dispath(self, request):
-        basehandler.dispath(cls, request)
-        pass
-
-    def wsgi_app(self, environ, start_response):
-        # TODO: webob 使いたくないでござる
-        request = webob.Request(environ)
-        response = self.dispatch(request)
-        return response(environ, start_response)
-
-    def __call__(self, environ, start_response):
-        return self.wsgi_app(environ, start_response)
-
-    def run(self, host='127.0.0.1', port=9000):
-        server = WSGIServer((args.host, args.port), EchoWebSocketApplication(args.host, args.port))
-        server.serve_forever()
 
 
 if __name__ == '__main__':
@@ -190,7 +98,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--port', default=9000, type=int)
     args = parser.parse_args()
 
-    server = WSGIServer((args.host, args.port), EchoWebSocketApplication(args.host, args.port))
+    server = WSGIServer((args.host, args.port), WebSocketHandler(args.host, args.port))
     server.serve_forever()
 
 

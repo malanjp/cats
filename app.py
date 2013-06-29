@@ -1,22 +1,93 @@
 # -*- coding: utf-8 -*-
-from cats import Cats, BaseHandler, HTTPResponse, WSGIApplication
+from cats import WebSocketHandler
+from ws4py.server.geventserver import WSGIServer
+import argparse
+import random
 
-#cats = Cats()
-#
-#def Test(BaseHandler):
-#    def get(self):
-#        return self.render_template('templates/index.html')
-#
-#
-#urls = [
-#    url(path='/test', controller=Test, name='test'),
-#]
-#
-#app = WSGIApplication(urls=urls, options={'encoding':'utf-8'})
-#
-#httpd = app.run('0.0.0.0', 8000, app)
-#print("Serving on port 8000...")
+class Test(WebSocketHandler):
 
+    def favicon(self, environ, start_response):
+        """
+        Don't care about favicon, let's send nothing.
+        """
+        status = '200 OK'
+        headers = [('Content-type', 'text/plain')]
+        start_response(status, headers)
+        return ""
+
+
+    def webapp(self, environ, start_response):
+        """
+        Our main webapp that'll display the chat form
+        """
+        status = '200 OK'
+        headers = [('Content-type', 'text/html')]
+
+        start_response(status, headers)
+        print(args.host, args.port)
+
+        return """<html>
+        <head>
+        <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
+          <script type='application/javascript'>
+            $(document).ready(function() {
+
+              websocket = 'ws://%(host)s:%(port)s/ws';
+              if (window.WebSocket) {
+                console.log('websocket');
+                ws = new WebSocket(websocket);
+                console.log(ws);
+              }
+              else if (window.MozWebSocket) {
+                console.log('mozwebsocket');
+                ws = MozWebSocket(websocket);
+              }
+              else {
+                console.log('WebSocket Not Supported');
+                return;
+              }
+
+              window.onbeforeunload = function(e) {
+                 $('#chat').val($('#chat').val() + 'Bye bye...\\n');
+                 ws.close(1000, '%(username)s left the room');
+
+                 if(!e) e = window.event;
+                 e.stopPropagation();
+                 e.preventDefault();
+              };
+              ws.onmessage = function (evt) {
+                 $('#chat').val($('#chat').val() + evt.data + '\\n');
+              };
+              ws.onopen = function() {
+                 ws.send("%(username)s entered the room");
+              };
+              ws.onclose = function(evt) {
+                console.log('closed');
+                 $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\\n');
+              };
+
+              $('#send').click(function() {
+                 console.log($('#message').val());
+                 ws.send('%(username)s: ' + $('#message').val());
+                 $('#message').val("");
+                 return false;
+              });
+            });
+          </script>
+        </head>
+        <body>
+        <form action='#' id='chatform' method='get'>
+          <textarea id='chat' cols='35' rows='10'></textarea>
+          <br />
+          <label for='message'>%(username)s: </label><input type='text' id='message' />
+          <input id='send' type='submit' value='Send' />
+          </form>
+        </body>
+        </html>
+        """ % {'username': "User%d" % random.randint(0, 100),
+               'host': self.host,
+               'port': self.port}
+    
 
 if __name__ == '__main__':
     from ws4py import configure_logger
@@ -27,7 +98,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--port', default=9000, type=int)
     args = parser.parse_args()
 
-    server = WSGIServer((args.host, args.port), EchoWebSocketApplication(args.host, args.port))
+    server = WSGIServer((args.host, args.port), Test(args.host, args.port))
     server.serve_forever()
 
 

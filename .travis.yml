@@ -1,15 +1,23 @@
 language: python
+
 python:
-  - "2.7"
-#  - "3.3"
-before_script:
-  - pip install -r requirements.txt --use-mirrors
-script:
-  - py.test 
+  - 2.7
+  - 3.2
+  - 3.3
+
+install:
+  - sudo apt-get install python-dev libevent-dev
+  - pip install --use-mirrors Cython
+  - pip install https://github.com/Lawouach/WebSocket-for-Python/archive/master.zip
+
+script: 
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then python -m py.test discover; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then python -m py.test discover; fi
 
 notifications:
   emails:
     - mshibata@i.softbank.jp
   on_success: change
   on_failure: always
+
 

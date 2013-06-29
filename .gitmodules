@@ -1,0 +1,3 @@
+[submodule "ws4py-ivideon"]
+	path = ws4py-ivideon
+	url = git@github.com:Lawouach/WebSocket-for-Python.git

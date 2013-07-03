@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-from cats import WebSocketHandler
-from ws4py.server.geventserver import WSGIServer
+import cats
+from cats import WebSocketHandler, Cats
 import argparse
 import random
 
+app = Cats()
+
+
 class Test(WebSocketHandler):
+    def get(self, environ, start_response):
+        return self.webapp(environ, start_response)
 
     def favicon(self, environ, start_response):
         """
@@ -14,7 +19,6 @@ class Test(WebSocketHandler):
         headers = [('Content-type', 'text/plain')]
         start_response(status, headers)
         return ""
-
 
     def webapp(self, environ, start_response):
         """
@@ -28,7 +32,7 @@ class Test(WebSocketHandler):
 
         return """<html>
         <head>
-        <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
+          <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
           <script type='application/javascript'>
             $(document).ready(function() {
 
@@ -85,9 +89,26 @@ class Test(WebSocketHandler):
         </body>
         </html>
         """ % {'username': "User%d" % random.randint(0, 100),
-               'host': self.host,
-               'port': self.port}
-    
+               'host': args.host,
+               'port': args.port}
+
+
+class Test2(WebSocketHandler):
+    def get(self, environ, start_response):
+        status = '200 OK'
+        headers = [('Content-type', 'text/plain')]
+        start_response(status, headers)
+        return 'Test2 hogehoge'
+
+
+## mock url
+urls = [
+        ('/', Test), # call 'get' method from Test class
+        ('/test2', Test2), # call 'get' method from Test class
+       ]
+
+app.routes(urls)
+
 
 if __name__ == '__main__':
     from ws4py import configure_logger
@@ -98,7 +119,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--port', default=9000, type=int)
     args = parser.parse_args()
 
-    server = WSGIServer((args.host, args.port), Test(args.host, args.port))
+    server = app.run(args.host, args.port)
     server.serve_forever()
 
 

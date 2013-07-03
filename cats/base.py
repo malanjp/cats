@@ -39,11 +39,34 @@ class BroadcastWebSocket(EchoWebSocket):
                 except:
                     pass
 
-class WebSocketHandler(object):
-    def __init__(self, host, port):
+
+class WebSocketHandler:
+    def favicon(self, environ, start_response):
+        """
+        Don't care about favicon, let's send nothing.
+        """
+        status = '200 OK'
+        headers = [('Content-type', 'text/plain')]
+        start_response(status, headers)
+        return ""
+
+    def webapp(self, environ, start_response):
+        """
+        Our main webapp that'll display the chat form
+        """
+        status = '200 OK'
+        headers = [('Content-type', 'text/html')]
+
+        start_response(status, headers)
+        return "this is a WebSocketHandler class."
+
+
+class Dispatcher:
+    def __init__(self, host, port, url_list):
         self.host = host
         self.port = port
         self.ws = WebSocketWSGIApplication(handler_cls=BroadcastWebSocket)
+        self.url_list = url_list
 
         # keep track of connected websocket clients
         # so that we can brodcasts messages sent by one
@@ -64,6 +87,15 @@ class WebSocketHandler(object):
             environ['ws4py.app'] = self
             return self.ws(environ, start_response)
 
+        return self.dispatch(environ, start_response)
+
+    def dispatch(self, environ, start_response):
+        print(self.url_list)
+        for cls in self.url_list:
+            if cls[0] == environ['PATH_INFO']:
+                instance = cls[1]()
+                return instance.get(environ, start_response)
+
         return self.webapp(environ, start_response)
 
     def favicon(self, environ, start_response):
@@ -83,10 +115,27 @@ class WebSocketHandler(object):
         headers = [('Content-type', 'text/html')]
 
         start_response(status, headers)
-        print(args.host, args.port)
         return "this is a WebSocketHandler class."
 
 
+class Cats:
+    def routes(self, urls=None):
+        self.url_list = urls
+        print(urls)
+
+    def run(self, host='localhost', port=9000):
+        #TODO: app.py のクラス呼び出したい
+        #server = WSGIServer((host, port), WebSocketHandler(host, port))
+        server = WSGIServer((host, port), Dispatcher(host, port, self.url_list))
+        server.serve_forever()
+
+
+def url(pattern, handler, kwargs=None, name=None):
+    """ Converts parameters to tupple of length four.
+        Used for convenience to name parameters and skip
+        unused.
+    """
+    return pattern, handler, kwargs, name
 
 
 if __name__ == '__main__':

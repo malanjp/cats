@@ -61,7 +61,7 @@ class WebSocketHandler:
         return "this is a WebSocketHandler class."
 
 
-class Dispatcher:
+class WSGIHandler:
     def __init__(self, host, port, url_list):
         self.host = host
         self.port = port
@@ -96,7 +96,13 @@ class Dispatcher:
                 instance = cls[1]()
                 return instance.get(environ, start_response)
 
-        return self.webapp(environ, start_response)
+        return self.Http404(environ, start_response)
+
+    def Http404(self, environ, start_response):
+        status = '404 NotFound'
+        headers = [('Content-type', 'text/plain')]
+        start_response(status, headers)
+        return "404 NotFound"
 
     def favicon(self, environ, start_response):
         """
@@ -126,7 +132,7 @@ class Cats:
     def run(self, host='localhost', port=9000):
         #TODO: app.py のクラス呼び出したい
         #server = WSGIServer((host, port), WebSocketHandler(host, port))
-        server = WSGIServer((host, port), Dispatcher(host, port, self.url_list))
+        server = WSGIServer((host, port), WSGIHandler(host, port, self.url_list))
         server.serve_forever()
 
 

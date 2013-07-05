@@ -12,6 +12,12 @@ from ws4py.server.geventserver import WebSocketWSGIApplication, \
      WebSocketWSGIHandler, WSGIServer
 from ws4py.websocket import EchoWebSocket
 
+from webob import Request
+
+from jinja2 import Environment, PackageLoader
+
+from pprint import pprint
+
 
 class BroadcastWebSocket(EchoWebSocket):
     def opened(self):
@@ -50,28 +56,19 @@ class WebSocketHandler:
         start_response(status, headers)
         return ""
 
-    def webapp(self, environ, start_response):
-        """
-        Our main webapp that'll display the chat form
-        """
-        status = '200 OK'
-        headers = [('Content-type', 'text/html')]
-
-        start_response(status, headers)
-        return "this is a WebSocketHandler class."
-
 
 class WSGIHandler:
+    """
+    WSGIHandler class handles the HTTP request various.
+    """
     def __init__(self, host, port, url_list):
         self.host = host
         self.port = port
         self.ws = WebSocketWSGIApplication(handler_cls=BroadcastWebSocket)
         self.url_list = url_list
 
-        # keep track of connected websocket clients
-        # so that we can brodcasts messages sent by one
-        # to all of them. Aren't we cool?
         self.clients = []
+        self.methods = {'GET':'get', 'POST':'post'}
 
     def __call__(self, environ, start_response):
         """
@@ -90,11 +87,16 @@ class WSGIHandler:
         return self.dispatch(environ, start_response)
 
     def dispatch(self, environ, start_response):
-        print(self.url_list)
+        request = Request(environ)
         for cls in self.url_list:
             if cls[0] == environ['PATH_INFO']:
                 instance = cls[1]()
-                return instance.get(environ, start_response)
+                response = getattr(instance, self.methods[request.method])(request)
+                status = '200 OK'
+                headers = [('Content-type', 'text/html')]
+                start_response(status, headers)
+                return response
+
 
         return self.Http404(environ, start_response)
 
@@ -113,48 +115,23 @@ class WSGIHandler:
         start_response(status, headers)
         return ""
 
-    def webapp(self, environ, start_response):
-        """
-        Our main webapp that'll display the chat form
-        """
-        status = '200 OK'
-        headers = [('Content-type', 'text/html')]
-
-        start_response(status, headers)
-        return "this is a WebSocketHandler class."
-
 
 class Cats:
     def routes(self, urls=None):
+        """
+        Routing.
+        """
         self.url_list = urls
-        print(urls)
 
     def run(self, host='localhost', port=9000):
+        """
+        Run http and websocket server.
+        """
         #TODO: app.py のクラス呼び出したい
         #server = WSGIServer((host, port), WebSocketHandler(host, port))
         server = WSGIServer((host, port), WSGIHandler(host, port, self.url_list))
         server.serve_forever()
 
-
-def url(pattern, handler, kwargs=None, name=None):
-    """ Converts parameters to tupple of length four.
-        Used for convenience to name parameters and skip
-        unused.
-    """
-    return pattern, handler, kwargs, name
-
-
-if __name__ == '__main__':
-    from ws4py import configure_logger
-    configure_logger()
-
-    parser = argparse.ArgumentParser(description='Echo gevent Server')
-    parser.add_argument('--host', default='192.168.72.100')
-    parser.add_argument('-p', '--port', default=9000, type=int)
-    args = parser.parse_args()
-
-    server = WSGIServer((args.host, args.port), WebSocketHandler(args.host, args.port))
-    server.serve_forever()
 
 
 

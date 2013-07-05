@@ -21,22 +21,20 @@ from pprint import pprint
 
 class BroadcastWebSocket(EchoWebSocket):
     def opened(self):
-        app = self.environ['ws4py.app']
+        app = self.environ['catsws.app']
         app.clients.append(self)
-        print('ws opend')
 
     def received_message(self, m):
         # self.clients is set from within the server
         # and holds the list of all connected servers
         # we can dispatch to
-        app = self.environ['ws4py.app']
+        app = self.environ['catsws.app']
         for client in app.clients:
             print(m)
             client.send(m)
 
     def closed(self, code, reason="A client left the room without a proper explanation."):
-        print('ws closed')
-        app = self.environ.pop('ws4py.app')
+        app = self.environ.pop('catsws.app')
         if self in app.clients:
             app.clients.remove(self)
             for client in app.clients:
@@ -75,13 +73,12 @@ class WSGIHandler:
         Good ol' WSGI application. This is a simple demo
         so I tried to stay away from dependencies.
         """
-        print(environ['PATH_INFO'])
+        print(environ.get('HTTP_UPGRADE'))
         if environ['PATH_INFO'] == '/favicon.ico':
             return self.favicon(environ, start_response)
 
-        if environ['PATH_INFO'] == '/ws':
-            print('ws')
-            environ['ws4py.app'] = self
+        if environ.get('HTTP_UPGRADE') == 'websocket':
+            environ['catsws.app'] = self
             return self.ws(environ, start_response)
 
         return self.dispatch(environ, start_response)

@@ -5,7 +5,7 @@
     <script type='application/javascript'>
       $(document).ready(function() {
 
-        websocket = 'ws://{{host}}:{{port}}/ws';
+        websocket = 'ws://{{host}}:{{port}}/';
         if (window.WebSocket) {
           console.log('websocket');
           ws = new WebSocket(websocket);

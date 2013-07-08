@@ -9,11 +9,12 @@ app = Cats()
 
 class ViewTest:
     def get(self, request):
-        return render_template('index.jinja', {
-                                               'username': random.randint(0, 100),
-                                               'host': args.host,
-                                               'port': args.port
-                                              })
+        return render_template('index.jinja', \
+            {
+             'username': random.randint(0, 100),
+             'host': args.host,
+             'port': args.port
+            })
 
     def post(self, request):
         return 'called post method.'
@@ -24,7 +25,8 @@ class ViewTest2:
         return 'Test2 hogehoge'
 
 
-## mock url
+
+# defining route
 urls = [
         ('/', ViewTest), # call 'get' method from Test class
         ('/test2', ViewTest2), # call 'get' method from Test class

@@ -20,31 +20,31 @@
           return;
         }
 
-      window.onbeforeunload = function(e) {
-        $('#chat').val($('#chat').val() + 'Bye bye...\n');
-        ws.close(1000, 'user{{username}} left the room');
+        window.onbeforeunload = function(e) {
+          $('#chat').val($('#chat').val() + 'Bye bye...\n');
+          ws.close(1000, 'user{{username}} left the room');
 
-        if(!e) e = window.event;
-        e.stopPropagation();
-        e.preventDefault();
-      };
-      ws.onmessage = function (evt) {
-        $('#chat').val($('#chat').val() + evt.data + '\n');
-      };
-      ws.onopen = function() {
-        ws.send("user{{username}} entered the room");
-      };
-      ws.onclose = function(evt) {
-        console.log('closed');
-        $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\n');
-      };
+          if(!e) e = window.event;
+          e.stopPropagation();
+          e.preventDefault();
+        };
+        ws.onmessage = function (evt) {
+          $('#chat').val($('#chat').val() + evt.data + '\n');
+        };
+        ws.onopen = function() {
+          ws.send("user{{username}} entered the room");
+        };
+        ws.onclose = function(evt) {
+          console.log('closed');
+          $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\n');
+        };
 
-      $('#send').click(function() {
-        console.log($('#message').val());
-        ws.send('user{{username}}: ' + $('#message').val());
-        $('#message').val("");
-        return false;
-      });
+        $('#send').click(function() {
+          console.log($('#message').val());
+          ws.send('user{{username}}: ' + $('#message').val());
+          $('#message').val("");
+          return false;
+        });
       });
     </script>
   </head>

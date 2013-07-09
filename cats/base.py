@@ -127,7 +127,6 @@ class Cats:
         SocketIO Routing.
         """
         self.socketio_url_list = socketio_urls
-        #print(self.socketio_url_list)
 
     def run(self, host='localhost', port=9000):
         """

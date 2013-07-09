@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import cats
-from cats import Cats, render_template
+from cats import Cats, BaseSocketIO, render_template
 import argparse
 import random
 
@@ -25,20 +25,46 @@ class ViewTest2:
         return 'Test2 hogehoge'
 
 
+class ViewTestSocketIO(BaseSocketIO):
+    def on_nickname(self, nickname):
+        if not self.request['box'].get('nicknames'):
+            self.request['box']['nicknames'] = []
+
+        self.request['box']['nicknames'].append(nickname)
+        self.socket.session['nickname'] = nickname
+        self.broadcast_event('announcement', '%s has connected' % nickname)
+        self.broadcast_event('nicknames', self.request['box']['nicknames'])
+        # Just have them join a default-named room
+        self.join('main_room')
+
+    def recv_disconnect(self):
+        # Remove nickname from the list.
+        nickname = self.socket.session['nickname']
+        self.request['box']['nicknames'].remove(nickname)
+        self.broadcast_event('announcement', '%s has disconnected' % nickname)
+        self.broadcast_event('nicknames', self.request['box']['nicknames'])
+
+        self.disconnect(silent=True)
+
+    def on_user_message(self, msg):
+        self.emit_to_room('main_room', 'msg_to_room',
+            self.socket.session['nickname'], msg)
+
 
 # defining route
 urls = [
         ('/', ViewTest), # call 'get' method from Test class
         ('/test2', ViewTest2), # call 'get' method from Test class
        ]
+socketio_urls = [
+        ('/', ViewTestSocketIO), # call 'get' method from Test class
+       ]
 
 app.routes(urls)
+app.socketio_routes(socketio_urls)
 
 
 if __name__ == '__main__':
-    from ws4py import configure_logger
-    configure_logger()
-
     parser = argparse.ArgumentParser(description='Echo gevent Server')
     parser.add_argument('--host', default='192.168.72.100')
     parser.add_argument('-p', '--port', default=9000, type=int)

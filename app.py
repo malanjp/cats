@@ -34,11 +34,9 @@ class ViewTestSocketIO(BaseSocketIO):
         self.socket.session['nickname'] = nickname
         self.broadcast_event('announcement', '%s has connected' % nickname)
         self.broadcast_event('nicknames', self.request['box']['nicknames'])
-        # Just have them join a default-named room
         self.join('main_room')
 
     def recv_disconnect(self):
-        # Remove nickname from the list.
         nickname = self.socket.session['nickname']
         self.request['box']['nicknames'].remove(nickname)
         self.broadcast_event('announcement', '%s has disconnected' % nickname)

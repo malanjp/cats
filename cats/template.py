@@ -12,7 +12,6 @@ def render_to_string(filename, context={}):
 
 def render_template(filename, context={}, mimetype=default_mimetype, request=None):
     if request:
-        print(request)
         context['request'] = request
     rendered = render_to_string(filename, context)
     return rendered

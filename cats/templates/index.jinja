@@ -1,72 +1,9 @@
-{#
-<html>
-  <head>
-    <title>test cats websocket</title>
-    <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js'></script>
-    <script type='application/javascript'>
-      $(document).ready(function() {
-
-        websocket = 'ws://{{host}}:{{port}}/';
-        if (window.WebSocket) {
-          console.log('websocket');
-          ws = new WebSocket(websocket);
-          console.log(ws);
-        }
-        else if (window.MozWebSocket) {
-          console.log('mozwebsocket');
-          ws = MozWebSocket(websocket);
-        }
-        else {
-          console.log('WebSocket Not Supported');
-          return;
-        }
-
-        window.onbeforeunload = function(e) {
-          $('#chat').val($('#chat').val() + 'Bye bye...\n');
-          ws.close(1000, 'user{{username}} left the room');
-
-          if(!e) e = window.event;
-          e.stopPropagation();
-          e.preventDefault();
-        };
-        ws.onmessage = function (evt) {
-          $('#chat').val($('#chat').val() + evt.data + '\n');
-        };
-        ws.onopen = function() {
-          ws.send("user{{username}} entered the room");
-        };
-        ws.onclose = function(evt) {
-          console.log('closed');
-          $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\n');
-        };
-
-        $('#send').click(function() {
-          console.log($('#message').val());
-          ws.send('user{{username}}: ' + $('#message').val());
-          $('#message').val("");
-          return false;
-        });
-      });
-    </script>
-  </head>
-  <body>
-    <form action='#' id='chatform' method='get'>
-      <textarea id='chat' cols='35' rows='10'></textarea>
-      <br />
-      <label for='message'>user{{username}}: </label><input type='text' id='message' />
-      <input id='send' type='submit' value='Send' />
-    </form>
-  </body>
-</html>
-#}
-
-
 <!DOCTYPE html>
 <html>
   <head>
     <link href="/static/css/style.css" rel="stylesheet">
-    <script type="text/javascript" src="/static/jquery-1.6.1.min.js"></script>
-    <script type="text/javascript" src="/static/socket.io.js"></script>
+    <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
+    <script type="text/javascript" src="/static/js/socket.io.js"></script>
     <script>
 
 WEB_SOCKET_SWF_LOCATION = "/static/WebSocketMain.swf";

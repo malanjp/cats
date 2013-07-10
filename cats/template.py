@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from jinja2 import PackageLoader, TemplateNotFound, Environment
+from jinja2 import FileSystemLoader, TemplateNotFound, Environment
 
 default_mimetype = 'text/html'
 
-env = Environment(loader=PackageLoader('cats', 'templates'))
+env = Environment(loader=FileSystemLoader('templates'))
 
 def render_to_string(filename, context={}):
     template = env.get_template(filename)

@@ -6,7 +6,6 @@ import random
 
 app = Cats()
 
-
 class ViewTest:
     def get(self, request):
         return render_template('index.jinja', \

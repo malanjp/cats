@@ -5,13 +5,6 @@ import argparse
 import random
 import os
 
-#import gevent
-#import gevent.pywsgi
-#
-#from ws4py.server.geventserver import WebSocketWSGIApplication, \
-#     WebSocketWSGIHandler, WSGIServer
-#from ws4py.websocket import EchoWebSocket
-
 from socketio import socketio_manage
 from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
@@ -23,6 +16,8 @@ from jinja2 import Environment, PackageLoader
 
 from pprint import pprint
 
+
+TEMPLATE_DIR = 'templates'
 
 class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
     def recv_disconnect(self):

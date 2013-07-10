@@ -5,19 +5,14 @@ import argparse
 import random
 import os
 
+from webob import Request
 from socketio import socketio_manage
 from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
-
-from webob import Request
-
 from jinja2 import Environment, PackageLoader
-
 from pprint import pprint
 
-
-TEMPLATE_DIR = 'templates'
 
 class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
     def recv_disconnect(self):

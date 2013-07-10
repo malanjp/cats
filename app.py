@@ -64,7 +64,7 @@ app.socketio_routes(socketio_urls)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Echo gevent Server')
-    parser.add_argument('--host', default='192.168.72.100')
+    parser.add_argument('--host', default='0.0.0.0')
     parser.add_argument('-p', '--port', default=9000, type=int)
     args = parser.parse_args()
 

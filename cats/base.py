@@ -9,6 +9,9 @@ import mimetypes
 
 
 class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
+    """
+    BaseSocketIO class handles the socketio request various.
+    """
     def recv_disconnect(self):
         self.disconnect(silent=True)
 

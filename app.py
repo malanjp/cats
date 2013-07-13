@@ -5,6 +5,7 @@ import random
 
 app = Cats()
 
+
 class ViewTest:
     def get(self, request):
         return render_template('index.jinja', \
@@ -15,7 +16,7 @@ class ViewTest:
             })
 
     def post(self, request):
-        return 'called post method.'
+        return u'you sent message: %s' % request.POST.get('post-msg')
 
 
 class ViewTest2:

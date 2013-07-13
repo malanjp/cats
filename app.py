@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import cats
 from cats import Cats, BaseSocketIO, render_template
 import argparse
 import random

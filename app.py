@@ -16,6 +16,7 @@ class ViewTest:
             })
 
     def post(self, request):
+        print(request.POST['post-msg'])
         return u'you sent message: %s' % request.POST.get('post-msg')
 
 

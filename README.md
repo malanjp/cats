@@ -1,10 +1,10 @@
 cats
 ====
-gevent based web framework with socketio.
+cats is a gevent based web framework with socketio for python web-applications.
 
 ### requirements
-CPython 2.7+
+Python 2.7+ < 3.0
 
 ### example
-please see app.py file.
+python example/app.py
 

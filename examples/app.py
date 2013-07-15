@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import os, sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(current_dir, '..'))
 from cats import Cats, BaseSocketIO, render_template
 import argparse
 import random
 
 app = Cats()
+
 
 class ViewTest:
     def get(self, request):
@@ -15,7 +19,8 @@ class ViewTest:
             })
 
     def post(self, request):
-        return 'called post method.'
+        #print(request.POST.get('post-msg'))
+        return 'you sent message: %s' % request.POST.get('post-msg')
 
 
 class ViewTest2:

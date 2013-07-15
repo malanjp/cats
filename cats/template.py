@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from jinja2 import FileSystemLoader, TemplateNotFound, Environment
+from jinja2 import FileSystemLoader, Environment
 
 default_mimetype = 'text/html'
 

@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 from gevent import monkey; monkey.patch_all()
-from webob import Request
+from webob import Request, Response
 from socketio import socketio_manage
 from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
 import mimetypes
 
+from pprint import pprint
+
 
 class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
+    """
+    BaseSocketIO class handles the socketio request various.
+    """
     def recv_disconnect(self):
         self.disconnect(silent=True)
 
@@ -52,16 +57,14 @@ class WSGIHandler(object):
         if path == '':
             path = '/'
 
-        request = Request(environ)
+        request = Request(environ, charset='utf8')
         for cls in self.url_list:
             if cls[0] == path:
                 instance = cls[1]()
                 response = getattr(instance,
                                    self.methods[request.method])(request)
-                status = '200 OK'
-                headers = [('Content-type', 'text/html')]
-                start_response(status, headers)
-                return response
+                response = Response(body=response, charset='utf8')
+                return response(environ, start_response)
 
         return self.static(path, start_response)
 

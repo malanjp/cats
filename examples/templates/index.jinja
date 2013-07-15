@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
+    <meta charset="UTF-8" />
     <link href="/static/css/style.css" rel="stylesheet">
     <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
     <script type="text/javascript" src="/static/js/socket.io.js"></script>
@@ -82,7 +83,7 @@
     <div id="nickname">
       <form id="set-nickname" class="wrap" action="">
         <p>Please type in your nickname and press enter.</p>
-        <input id="nick">
+        <input id="nick" placeholder="nickname">
         <p id="nickname-err">Nickname already in use</p>
     </form>
     </div>
@@ -94,9 +95,15 @@
       <div id="lines"></div>
     </div>
     <form id="send-message" action="">
-      <input id="message">
+      <input id="message" placeholder="message">
       <button>Send</button>
     </form>
   </div>
+  <form id="test-post" action="" method="post">
+    <input id="post-msg" name="post-msg" placeholder="post test form">
+    <input type="submit" value="send">
+  </form>
 </body>
 </html>
+
+

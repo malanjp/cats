@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <script type='application/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
+    <script type="text/javascript" src="/static/js/socket.io.js"></script>
+    <script>
+      WEB_SOCKET_SWF_LOCATION = "/static/WebSocketMain.swf";
+      WEB_SOCKET_DEBUG = true;
+
+      // socket.io specific code
+      var socket = io.connect();
+
+      $(window).bind("beforeunload", function() {
+        socket.disconnect();
+      });
+
+      socket.on('connect', function () {
+        console.log('connected');
+        $('#message').html('connected');
+      });
+
+      socket.on('reconnect', function () {
+        console.log('reconnected');
+        $('#message').html('reconnected');
+      });
+
+      socket.on('reconnecting', function () {
+        console.log('reconnecting...');
+        $('#message').html('reconnecting...');
+      });
+
+      socket.on('error', function (e) {
+        console.log('[A unknown error occurred]' + e);
+        $('#message').html('[A unknown error occurred]' + e);
+      });
+
+      socket.on('todo', function (data) {
+        console.log(data);
+        $('<li class="todo">' + data + '</li>').prependTo('#list');
+      });
+
+      // DOM manipulation
+      $(function () {
+        $('#form-todo').submit(function () {
+          socket.emit('todo', $('#input-todo').val());
+          $('#input-todo').val('').focus();
+          return false;
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="message"></div>
+    <div id="todolist">
+      <div id="new">
+        <form id="form-todo" class="wrap" action="">
+          <input id="input-todo" placeholder="please input todo.">
+        </form>
+      </div>
+      <ul id="list">
+      </ul>
+    </div>
+  </body>
+</html>
+
+

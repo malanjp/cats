@@ -17,8 +17,8 @@ class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
     def recv_disconnect(self):
         self.disconnect(silent=True)
 
-    def recv_message(self, message):
-        print "PING!!!", message
+    #def recv_message(self, message):
+    #    print "PING!!!", message
 
 
 class WSGIHandler(object):

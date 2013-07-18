@@ -28,7 +28,6 @@ class WSGIHandler(object):
     def __init__(self, url_list, socketio_url_list):
         self.url_list = url_list
         self.socketio_url_list = socketio_url_list
-        self.methods = {'GET': 'get', 'POST': 'post'}
         self.request = {'box': {}}
 
     def __call__(self, environ, start_response):
@@ -62,7 +61,7 @@ class WSGIHandler(object):
             if cls[0] == path:
                 instance = cls[1]()
                 response = getattr(instance,
-                                   self.methods[request.method])(request)
+                                   self.methods[request.method.lower()])(request)
                 response = Response(body=response, charset='utf8')
                 return response(environ, start_response)
 

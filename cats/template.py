@@ -19,7 +19,12 @@ def render_template(filename, context={}, mimetype=default_mimetype, request=Non
     return rendered
 
 
+templates_dir = 'templates'
+
 settings = load_settings('settings')
-env = Environment(loader=FileSystemLoader(settings.templates_dir))
+if settings.templates_dir:
+    templates_dir = settings.templates_dir
+
+env = Environment(loader=FileSystemLoader(templates_dir))
 
 

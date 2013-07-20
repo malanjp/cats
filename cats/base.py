@@ -7,8 +7,6 @@ from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
 import mimetypes
 
-from pprint import pprint
-
 
 class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
     """
@@ -16,9 +14,6 @@ class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
     """
     def recv_disconnect(self):
         self.disconnect(silent=True)
-
-    #def recv_message(self, message):
-    #    print "PING!!!", message
 
 
 class WSGIHandler(object):
@@ -60,8 +55,7 @@ class WSGIHandler(object):
         for cls in self.url_list:
             if cls[0] == path:
                 instance = cls[1]()
-                response = getattr(instance,
-                                   self.methods[request.method.lower()])(request)
+                response = getattr(instance, request.method.lower())(request)
                 response = Response(body=response, charset='utf8')
                 return response(environ, start_response)
 
@@ -85,6 +79,13 @@ class WSGIHandler(object):
 
 
 class Cats:
+    def __init__(self, settings=None):
+        self.settings('settings')
+
+    def settings(self, settings=None):
+        if settings:
+            self.settings = __import__(settings)
+
     def routes(self, urls=None):
         """
         Routing.

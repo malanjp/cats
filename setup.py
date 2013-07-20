@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(
-    name='Cats framework',
+    name='Cats',
     version='0.0.1dev',
     packages=['cats',],
     license='The MIT License',

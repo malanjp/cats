@@ -12,7 +12,7 @@ class ViewTest:
             {
              'host': args.host,
              'port': args.port
-            })
+            }, request=request)
 
     def post(self, request):
         return 'you sent message: %s' % request.POST.get('post-msg')

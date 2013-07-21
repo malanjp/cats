@@ -22,8 +22,11 @@ def render_template(filename, context={}, mimetype=default_mimetype, request=Non
 templates_dir = 'templates'
 
 settings = load_settings('settings')
-if settings.templates_dir:
+try:
+    getattr(settings, 'templates_dir')
     templates_dir = settings.templates_dir
+except AttributeError:
+    pass
 
 env = Environment(loader=FileSystemLoader(templates_dir))
 

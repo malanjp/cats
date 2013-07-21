@@ -31,6 +31,10 @@ def test_create_instance():
     cats = Cats()
     assert cats
 
+def test_create_instance_settings():
+    cats = Cats('notfoundsettings')
+    assert cats
+
 def test_add_route():
     urls = [
             ('/', ViewTest),

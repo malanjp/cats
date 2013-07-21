@@ -80,11 +80,17 @@ class WSGIHandler(object):
 
 class Cats:
     def __init__(self, settings=None):
-        self.settings('settings')
+        if settings:
+            self.settings(settings)
+        else:
+            self.settings('settings')
 
     def settings(self, settings=None):
         if settings:
-            self.settings = __import__(settings)
+            try:
+                self.settings = __import__(settings)
+            except:
+                self.settings = None
 
     def routes(self, urls=None):
         """

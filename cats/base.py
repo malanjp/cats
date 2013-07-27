@@ -20,7 +20,7 @@ class WSGIHandler(object):
     """
     WSGIHandler class handles the HTTP request various.
     """
-    def __init__(self, url_list, socketio_url_list):
+    def __init__(self, url_list=None, socketio_url_list=None):
         self.url_list = url_list
         self.socketio_url_list = socketio_url_list
         self.request = {'box': {}}
@@ -28,7 +28,7 @@ class WSGIHandler(object):
     def __call__(self, environ, start_response):
         path = environ['PATH_INFO'].strip('/')
 
-        if path.startswith("socket.io"):
+        if self.socketio_url_list and path.startswith("socket.io"):
             ns = self.create_namespace(environ)
             socketio_manage(environ=environ,
                             namespaces=ns,
@@ -48,13 +48,19 @@ class WSGIHandler(object):
         return namespace
 
     def dispatch(self, path, environ, start_response):
-        if path == '':
-            path = '/'
+        import re
+        if path == '/':
+            path = ''
 
         request = Request(environ, charset='utf8')
         for cls in self.url_list:
-            if cls[0] == path:
+            print('path', path, cls[0])
+            pattern = re.compile(cls[0])
+            match = pattern.match(path)
+            #if cls[0] == path:
+            if match:
                 instance = cls[1]()
+                print(instance)
                 response = getattr(instance, request.method.lower())(request)
                 response = Response(body=response, charset='utf8')
                 return response(environ, start_response)
@@ -80,11 +86,20 @@ class WSGIHandler(object):
 
 class Cats:
     def __init__(self, settings=None):
-        self.settings('settings')
+        self.url_list = None
+        self.socketio_url_list = None
+
+        if settings:
+            self.settings(settings)
+        else:
+            self.settings('settings')
 
     def settings(self, settings=None):
         if settings:
-            self.settings = __import__(settings)
+            try:
+                self.settings = __import__(settings)
+            except:
+                self.settings = None
 
     def routes(self, urls=None):
         """

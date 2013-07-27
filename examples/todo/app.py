@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os, sys
 from cats import Cats, BaseSocketIO, render_template
 import argparse
 
@@ -29,10 +28,11 @@ class ViewTestSocketIO(BaseSocketIO):
 
 # defining route
 urls = [
-        ('/', ViewTest), # call 'get' method from Test class
+        (r'^$', ViewTest),
+        (r'^test2/.*$', ViewTest),
        ]
 socketio_urls = [
-        ('/', ViewTestSocketIO), # call 'get' method from Test class
+        ('', ViewTestSocketIO),
        ]
 
 app.routes(urls)
@@ -40,7 +40,7 @@ app.socketio_routes(socketio_urls)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Echo gevent Server')
+    parser = argparse.ArgumentParser(description='Echo Gevent Server')
     parser.add_argument('--host', default='0.0.0.0')
     parser.add_argument('-p', '--port', default=9000, type=int)
     args = parser.parse_args()

@@ -54,8 +54,8 @@ class ViewTestSocketIO(BaseSocketIO):
 
 # defining route
 urls = [
-        ('/', ViewTest), # call 'get' method from Test class
-        ('/test2', ViewTest2), # call 'get' method from Test class
+        (r'^$', ViewTest), # call 'get' method from Test class
+        (r'^test2$', ViewTest2), # call 'get' method from Test class
        ]
 socketio_urls = [
         ('/', ViewTestSocketIO), # call 'get' method from Test class

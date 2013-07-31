@@ -29,10 +29,11 @@ class WSGIHandler(object):
         path = environ['PATH_INFO'].strip('/')
 
         if self.socketio_url_list and path.startswith("socket.io"):
+            request = Request(environ, charset='utf8')
             ns = self.create_namespace(environ)
             socketio_manage(environ=environ,
                             namespaces=ns,
-                            request=self.request)
+                            request=request)
         else:
             return self.dispatch(path, environ, start_response)
 

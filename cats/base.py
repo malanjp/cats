@@ -55,13 +55,11 @@ class WSGIHandler(object):
 
         request = Request(environ, charset='utf8')
         for cls in self.url_list:
-            print('path', path, cls[0])
             pattern = re.compile(cls[0])
             match = pattern.match(path)
             #if cls[0] == path:
             if match:
                 instance = cls[1]()
-                print(instance)
                 response = getattr(instance, request.method.lower())(request)
                 response = Response(body=response, charset='utf8')
                 return response(environ, start_response)

@@ -24,14 +24,13 @@ class WSGIHandler(object):
     def __init__(self, url_list=None, socketio_url_list=None):
         self.url_list = url_list
         self.socketio_url_list = socketio_url_list
-        self.request = {'box': {}}
 
     def __call__(self, environ, start_response):
         path = environ['PATH_INFO'].strip('/')
 
         if self.socketio_url_list and path.startswith("socket.io"):
             request = Request(environ, charset='utf8')
-            ns = self.create_namespace(environ)
+            ns = self.create_namespace(path, environ)
             socketio_manage(environ=environ,
                             namespaces=ns,
                             request=request)

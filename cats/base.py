@@ -6,6 +6,7 @@ from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
 import mimetypes
+import re
 
 
 class BaseSocketIO(BaseNamespace, RoomsMixin, BroadcastMixin):
@@ -29,14 +30,14 @@ class WSGIHandler(object):
         path = environ['PATH_INFO'].strip('/')
 
         if self.socketio_url_list and path.startswith("socket.io"):
-            ns = self.create_namespace(environ)
+            ns = self.create_namespace(path, environ)
             socketio_manage(environ=environ,
                             namespaces=ns,
                             request=self.request)
         else:
             return self.dispatch(path, environ, start_response)
 
-    def create_namespace(self, environ):
+    def create_namespace(self, path, environ):
         namespace = {}
 
         for cls in self.socketio_url_list:
@@ -48,19 +49,12 @@ class WSGIHandler(object):
         return namespace
 
     def dispatch(self, path, environ, start_response):
-        import re
-        if path == '/':
-            path = ''
-
         request = Request(environ, charset='utf8')
         for cls in self.url_list:
-            print('path', path, cls[0])
             pattern = re.compile(cls[0])
             match = pattern.match(path)
-            #if cls[0] == path:
             if match:
                 instance = cls[1]()
-                print(instance)
                 response = getattr(instance, request.method.lower())(request)
                 response = Response(body=response, charset='utf8')
                 return response(environ, start_response)

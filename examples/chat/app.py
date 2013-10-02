@@ -29,21 +29,19 @@ class ViewTest2:
 
 
 class ViewTestSocketIO(BaseSocketIO):
+    nicknames = []
     def on_nickname(self, nickname):
-        if not self.request['box'].get('nicknames'):
-            self.request['box']['nicknames'] = []
-
-        self.request['box']['nicknames'].append(nickname)
+        self.nicknames.append(nickname)
         self.socket.session['nickname'] = nickname
         self.broadcast_event('announcement', '%s has connected' % nickname)
-        self.broadcast_event('nicknames', self.request['box']['nicknames'])
+        self.broadcast_event('nicknames', self.nicknames)
         self.join('main_room')
 
     def recv_disconnect(self):
         nickname = self.socket.session['nickname']
-        self.request['box']['nicknames'].remove(nickname)
+        self.nicknames.remove(nickname)
         self.broadcast_event('announcement', '%s has disconnected' % nickname)
-        self.broadcast_event('nicknames', self.request['box']['nicknames'])
+        self.broadcast_event('nicknames', self.nicknames)
 
         self.disconnect(silent=True)
 
